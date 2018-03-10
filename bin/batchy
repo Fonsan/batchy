@@ -23,7 +23,6 @@ when 'retry_failed'
         command: j.container.command,
       }
     }
-    raise config.inspect
     batchy.submit_job(config)
   end
 when 'stats'
