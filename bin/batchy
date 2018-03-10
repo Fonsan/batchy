@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $: << File.expand_path('../../lib', __FILE__)
 require 'batchy'
-
+require 'json'
 operation = ARGV.shift
 queue_name = ARGV.shift
 client = Aws::Batch::Client.new
@@ -10,11 +10,11 @@ batchy = Batchy.new(client)
 case operation
 when 'list'
   batchy.job_summaries(queue_name, *ARGV) do |j|
-    p j
+    puts j.to_h.to_json
   end
 when 'detailed_list'
   batchy.jobs(queue_name, *ARGV) do |j|
-    p j
+    puts j.to_h.to_json
   end
 when 'retry_failed'
   job = client.describe_jobs(jobs: ARGV)
@@ -29,9 +29,7 @@ when 'retry_failed'
   end
 when 'stats'
   result = batchy.job_summaries(queue_name, *ARGV).each_with_object(Hash.new(0)) {|j, acc| acc[j.status] += 1 }
-  result.each do |k, v|
-    puts "#{k}\t#{v}"
-  end
+  puts JSON.pretty_generate(result)
 else
   raise "No such operation #{operation.inspect}"
 end
