@@ -17,15 +17,17 @@ when 'detailed_list'
     puts j.to_h.to_json
   end
 when 'retry_failed'
-  job = client.describe_jobs(jobs: ARGV)
-  batchy.jobs(queue_name, 'FAILED') do |j|
+  jobs = client.describe_jobs(jobs: ARGV)
+  jobs.each do |j|
     config = {
+      job_queue: queue_name,
+      job_definition: j.job_definition,
       job_name: j.job_name,
       container_overrides: {
         command: j.container.command,
       }
     }
-    batchy.submit_job(config)
+    client.submit_job(config)
   end
 when 'stats'
   result = batchy.job_summaries(queue_name, *ARGV).each_with_object(Hash.new(0)) {|j, acc| acc[j.status] += 1 }
