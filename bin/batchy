@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+$: << File.expand_path('../../lib', __FILE__)
+require 'batchy'
+
+operation, queue_name, *states = ARGV
+client = Aws::Batch::Client.new
+batchy = Batchy.new(client)
+
+case operation
+when 'list'
+  batchy.job_summaries(queue_name, *states) do |j|
+    p j
+  end
+when 'detailed_list'
+  batchy.jobs(queue_name, *states) do |j|
+    p j
+  end
+when 'retry_failed'
+  batchy.jobs(queue_name, 'FAILED') do |j|
+    config = {
+      job_name: j.job_name,
+      container_overrides: {
+        command: j.container.command,
+      }
+    }
+    raise config.inspect
+    batchy.submit_job(config)
+  end
+when 'stats'
+  result = batchy.job_summaries(queue_name, *states).each_with_object(Hash.new(0)) {|j, acc| acc[j.status] += 1 }
+  result.each do |k, v|
+    puts "#{k}\t#{v}"
+  end
+else
+  raise "No such operation #{operation.inspect}"
+end
