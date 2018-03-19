@@ -27,7 +27,7 @@ when 'retry_failed'
         command: j.container.command,
       }
     }
-    client.submit_job(config)
+    p client.submit_job(config)
   end
 when 'stats'
   result = batchy.job_summaries(queue_name, *ARGV).each_with_object(Hash.new(0)) {|j, acc| acc[j.status] += 1 }
