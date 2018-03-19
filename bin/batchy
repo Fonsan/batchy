@@ -17,7 +17,7 @@ when 'detailed_list'
     puts j.to_h.to_json
   end
 when 'retry_failed'
-  jobs = client.describe_jobs(jobs: ARGV)
+  jobs = client.describe_jobs(jobs: ARGV).jobs
   jobs.each do |j|
     config = {
       job_queue: queue_name,
