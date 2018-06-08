@@ -16,7 +16,7 @@ when 'detailed_list'
   batchy.jobs(queue_name, *ARGV) do |j|
     puts j.to_h.to_json
   end
-when 'retry_failed'
+when 'retry'
   jobs = client.describe_jobs(jobs: ARGV).jobs
   jobs.each do |j|
     config = {
