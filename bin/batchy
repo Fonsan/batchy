@@ -37,6 +37,14 @@ when 'cancel'
       reason: reason
     })]
   end
+when 'terminate'
+  reason = ARGV.shift
+  ARGV.each do |job_id|
+    p [job_id, client.terminate_job({
+      job_id: job_id,
+      reason: reason
+    })]
+  end
 when 'stats'
   result = batchy.job_summaries(queue_name, *ARGV).each_with_object(Hash.new(0)) {|j, acc| acc[j.status] += 1 }
   puts JSON.pretty_generate(result)
