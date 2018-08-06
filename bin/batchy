@@ -21,8 +21,8 @@ when 'retry'
   jobs.each do |j|
     config = {
       job_queue: queue_name,
-      job_name: j.job_name,
       job_definition: j.job_definition.gsub(/:\d+$/, ''),
+      job_name: "#{j.job_name}_retry",
       container_overrides: {
         command: j.container.command,
       }
